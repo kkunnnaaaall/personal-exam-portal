@@ -16,7 +16,6 @@ export default function AdminResults() {
   async function fetchEvaluatedExams() {
     setLoading(true);
     
-    // Fetch attempts along with exam details and questions to calculate total possible marks
     const { data, error } = await supabase
       .from("attempts")
       .select(`
@@ -46,7 +45,6 @@ export default function AdminResults() {
     return examData.title || "Unknown Exam";
   }
 
-  // Helper to calculate total max marks dynamically from the questions array
   function calculateTotalMarks(examData: any) {
     const exam = Array.isArray(examData) ? examData[0] : examData;
     if (!exam || !exam.questions || !Array.isArray(exam.questions)) return 0;
@@ -94,11 +92,10 @@ export default function AdminResults() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {results.map((attempt) => {
-                const finalScore = (attempt.mcq_score || 0) + (attempt.descriptive_score || 0);
+                // Read directly from the actual database columns shown in your Supabase screenshot
+                const finalScore = attempt.total_score ?? 0;
                 const totalPossibleMarks = calculateTotalMarks(attempt.exams);
-                const percentage = totalPossibleMarks > 0 
-                  ? Math.round((finalScore / totalPossibleMarks) * 100 * 100) / 100 
-                  : 0;
+                const percentage = attempt.percentage ?? (totalPossibleMarks > 0 ? Math.round((finalScore / totalPossibleMarks) * 100 * 100) / 100 : 0);
 
                 return (
                   <tr key={attempt.id} className="hover:bg-gray-50 transition-colors">
