@@ -16,12 +16,16 @@ export default function AdminResults() {
   async function fetchEvaluatedExams() {
     setLoading(true);
     
+    // Fetch attempts along with exam details and questions to calculate total possible marks
     const { data, error } = await supabase
       .from("attempts")
       .select(`
         *,
         exams (
-          title
+          title,
+          questions (
+            marks
+          )
         )
       `)
       .in("status", ["EVALUATED", "PUBLISHED"]) 
@@ -40,6 +44,13 @@ export default function AdminResults() {
     if (!examData) return "Unknown Exam";
     if (Array.isArray(examData)) return examData[0]?.title || "Unknown Exam";
     return examData.title || "Unknown Exam";
+  }
+
+  // Helper to calculate total max marks dynamically from the questions array
+  function calculateTotalMarks(examData: any) {
+    const exam = Array.isArray(examData) ? examData[0] : examData;
+    if (!exam || !exam.questions || !Array.isArray(exam.questions)) return 0;
+    return exam.questions.reduce((sum: number, q: any) => sum + (q.marks || 1), 0);
   }
 
   if (loading) {
@@ -78,12 +89,16 @@ export default function AdminResults() {
                 <th className="p-4">Submission Date</th>
                 <th className="p-4">Status</th>
                 <th className="p-4 text-right">Score</th>
+                <th className="p-4 text-center">Percentage</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {results.map((attempt) => {
-                // Calculate the true score based on your actual database columns
                 const finalScore = (attempt.mcq_score || 0) + (attempt.descriptive_score || 0);
+                const totalPossibleMarks = calculateTotalMarks(attempt.exams);
+                const percentage = totalPossibleMarks > 0 
+                  ? Math.round((finalScore / totalPossibleMarks) * 100 * 100) / 100 
+                  : 0;
 
                 return (
                   <tr key={attempt.id} className="hover:bg-gray-50 transition-colors">
@@ -109,8 +124,11 @@ export default function AdminResults() {
                         {finalScore}
                       </span>
                       <span className="text-gray-500 text-sm">
-                        {" "} Marks
+                        {" "} / {totalPossibleMarks} Marks
                       </span>
+                    </td>
+                    <td className="p-4 text-center font-medium text-blue-600">
+                      {percentage}%
                     </td>
                   </tr>
                 );
