@@ -86,7 +86,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
       `}>
         <div className="p-6 border-b border-gray-200">
-          <h1 className="text-xl font-bold text-gray-900">Exam Portal</h1>
+          <h1 className="text-xl font-bold text-gray-900">DOOBAA-DOOBIII Exam Portal</h1>
           <p className="text-xs text-gray-500 mt-1">Admin Control Panel</p>
         </div>
 

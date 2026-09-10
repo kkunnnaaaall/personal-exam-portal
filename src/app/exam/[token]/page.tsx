@@ -15,7 +15,7 @@ export default function ExamInstructions() {
   const [agreed, setAgreed] = useState(false);
   const [starting, setStarting] = useState(false);
   
-  // New states for locking mechanism
+  // Locking mechanism states
   const [isLocked, setIsLocked] = useState(false);
   const [timeUntilStart, setTimeUntilStart] = useState<string | null>(null);
 
@@ -23,7 +23,7 @@ export default function ExamInstructions() {
     fetchExamDetails();
   }, [params.token]);
 
-  // New useEffect to handle the live countdown timer
+  // Fixed live countdown timer with Days support
   useEffect(() => {
     if (!exam || !exam.start_time) return;
 
@@ -35,14 +35,16 @@ export default function ExamInstructions() {
       if (difference > 0) {
         setIsLocked(true);
         
-        // Calculate hours, minutes, and seconds
+        // Calculate days, hours, minutes, and seconds properly
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
         const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((difference % (1000 * 60)) / 1000);
         
         let timeString = "";
-        if (hours > 0) timeString += `${hours}h `;
-        if (minutes > 0 || hours > 0) timeString += `${minutes}m `;
+        if (days > 0) timeString += `${days}d `;
+        if (hours > 0 || days > 0) timeString += `${hours}h `;
+        if (minutes > 0 || hours > 0 || days > 0) timeString += `${minutes}m `;
         timeString += `${seconds}s`;
         
         setTimeUntilStart(timeString);
@@ -52,7 +54,6 @@ export default function ExamInstructions() {
       }
     }
 
-    // Check immediately, then update every second
     checkTime();
     const timerInterval = setInterval(checkTime, 1000);
 
@@ -77,7 +78,6 @@ export default function ExamInstructions() {
   async function handleStartExam() {
     setStarting(true);
     
-    // Check if an attempt already exists to prevent duplicate entries
     const { data: existingAttempt } = await supabase
       .from("attempts")
       .select("*")
@@ -90,12 +90,10 @@ export default function ExamInstructions() {
         setStarting(false);
         return;
       }
-      // If it exists but is not submitted, resume the attempt
       router.push(`/exam/${params.token}/attempt`);
       return;
     }
 
-    // Create a new attempt record using the server's current timestamp
     const { error } = await supabase
       .from("attempts")
       .insert([
@@ -164,8 +162,8 @@ export default function ExamInstructions() {
             <li>Read every question carefully before answering.</li>
             <li>Do not switch tabs, minimize the window, or exit fullscreen mode.</li>
             <li>The system monitors browser visibility and window focus to deter cheating.</li>
-            <li>Multiple Choice Questions (MCQs) are evaluated automatically.</li>
-            <li>5-mark descriptive questions will be manually evaluated by the examiner.</li>
+            <li>MCQs are evaluated automatically.</li>
+            <li>5-mark descriptive questions will be manually evaluated by Doobaaa....</li>
             <li>Your answers are saved automatically to the server as you type.</li>
             <li>When the timer reaches zero, the exam will submit automatically.</li>
             <li>Once submitted, the exam cannot be restarted.</li>
@@ -173,7 +171,7 @@ export default function ExamInstructions() {
 
           {exam.description && (
             <div className="bg-blue-50 p-4 rounded-lg mb-8">
-              <h3 className="text-sm font-bold text-blue-900 mb-1">Additional Note from Examiner:</h3>
+              <h3 className="text-sm font-bold text-blue-900 mb-1">Additional Note from Doobaaa:</h3>
               <p className="text-sm text-blue-800">{exam.description}</p>
             </div>
           )}
@@ -184,7 +182,7 @@ export default function ExamInstructions() {
               id="agreement"
               checked={agreed}
               onChange={handleCheckboxChange}
-              disabled={isLocked} // Prevent checking the box if exam is locked
+              disabled={isLocked}
               className="mt-1 w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 disabled:cursor-not-allowed"
             />
             <label htmlFor="agreement" className={`text-sm text-gray-700 select-none ${isLocked ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
