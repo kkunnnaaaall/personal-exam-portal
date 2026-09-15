@@ -219,7 +219,7 @@ export default function ExamAttempt() {
           <div className="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <Maximize className="w-10 h-10 text-pink-500" />
           </div>
-          <h2 className="text-2xl font-black text-pink-950 mb-4">DOOBAA-DOOBIII Secure Vault</h2>
+          <h2 className="text-2xl font-black text-pink-950 mb-4">DOOBAAA-DOOBIII Secure Vault</h2>
           <p className="text-gray-600 font-medium mb-8">
             This exam requires full-screen mode. Do not switch tabs, use keyboard shortcuts, or exit full-screen, or Doobaaa will record a violation strike!
           </p>
@@ -266,7 +266,7 @@ export default function ExamAttempt() {
         <div>
           <div className="flex items-center space-x-2 mb-1">
             <span className="w-2.5 h-2.5 rounded-full bg-pink-500 animate-pulse shadow-[0_0_8px_rgba(244,114,182,0.8)]" />
-            <span className="text-xs font-black tracking-widest text-pink-500">DOOBAA-DOOBIII PORTAL</span>
+            <span className="text-xs font-black tracking-widest text-pink-500">DOOBAAA-DOOBIII PORTAL</span>
           </div>
           <h1 className="text-xl font-black text-pink-950">{exam.title}</h1>
           <p className="text-sm font-medium text-gray-500 mt-0.5">Violations Recorded: <span className={violationCount > 0 ? "text-pink-600 font-bold" : ""}>{violationCount}/3</span></p>
