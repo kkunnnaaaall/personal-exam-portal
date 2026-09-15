@@ -42,7 +42,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [pathname, router]);
 
   const navItems = [
-    { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+    { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
     { name: "Exams", href: "/admin/exams", icon: FileText },
     { name: "Evaluations", href: "/admin/evaluations", icon: CheckSquare },
     { name: "Results", href: "/admin/results", icon: Award },
