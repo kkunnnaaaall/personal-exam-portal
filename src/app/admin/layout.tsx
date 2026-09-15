@@ -1,6 +1,7 @@
 // src/app/admin/layout.tsx
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { LayoutDashboard, FileText, CheckSquare, Award, Settings, LogOut, ShieldAlert } from "lucide-react";
@@ -9,10 +10,39 @@ import { supabase } from "@/lib/supabase";
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Updated to match your exact folder structure
+  // 1. THE VAULT DOOR: Check authentication before rendering anything
+  useEffect(() => {
+    async function checkAuth() {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      // If no session exists and they aren't already on the login page, boot them out
+      if (!session && !pathname.includes('/admin/login')) {
+        router.replace('/admin/login');
+      } else {
+        setIsAuthenticated(true);
+      }
+      setIsLoading(false);
+    }
+
+    checkAuth();
+
+    // Listen for auth changes (like session expiration or sign out)
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!session && !pathname.includes('/admin/login')) {
+        router.replace('/admin/login');
+      }
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, [pathname, router]);
+
   const navItems = [
-    { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+    { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
     { name: "Exams", href: "/admin/exams", icon: FileText },
     { name: "Evaluations", href: "/admin/evaluations", icon: CheckSquare },
     { name: "Results", href: "/admin/results", icon: Award },
@@ -24,11 +54,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     router.push("/admin/login");
   }
 
-  // Hide sidebar if we are on the admin login page
-  if (pathname === "/admin/login") {
+  // If loading the auth state, show nothing or a stealthy loader to prevent layout flashing
+  if (isLoading) {
+    return <div className="min-h-screen bg-[#050505]" />;
+  }
+
+  // If on the login page itself, don't show the sidebar, just show the login form
+  if (pathname.includes('/admin/login')) {
     return <>{children}</>;
   }
 
+  // If authenticated, render the full Command Center
   return (
     <div className="min-h-screen bg-[#050505] text-zinc-100 flex selection:bg-[#e30202]/30 font-sans">
       
