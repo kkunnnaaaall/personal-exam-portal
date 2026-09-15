@@ -7,7 +7,7 @@ import { Toaster } from 'react-hot-toast'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'DOOBAA-DOOBIII Exam Portal',
+  title: 'DOOBAAA-DOOBIII Exam Portal',
   description: 'Secure personal online examination system',
   other: {
     'strix-verification': 'strix-verify-a74fb22eb76beacecc03105690ea6611',
